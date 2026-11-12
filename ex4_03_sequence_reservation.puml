@@ -1,0 +1,37 @@
+@startuml
+title Exercice 4 - Séquence : réserver une salle
+actor Enseignant
+participant "IHM Console" as IHM
+participant GestionnaireReservations as G
+participant Salle
+participant Reservation
+
+Enseignant -> IHM : réserver(salle, date, début, fin, participants, motif)
+IHM -> IHM : convertir date et créneau
+IHM -> G : reserver(idEns, numero, date, creneau, nb, motif)
+G -> G : chercher l'enseignant
+G -> G : chercher la salle
+G -> Salle : capacite()
+Salle --> G : capacité
+alt enseignant ou salle inconnu(e)
+  G --> IHM : ReservationException
+  IHM --> Enseignant : message d'erreur
+else participants > capacité
+  G --> IHM : ReservationException (capacité dépassée)
+  IHM --> Enseignant : message d'erreur
+else
+  loop pour chaque réservation active de la salle à cette date
+    G -> Reservation : creneau().chevauche(nouveau créneau)
+    Reservation --> G : bool
+  end
+  alt créneau déjà occupé
+    G --> IHM : ReservationException (conflit)
+    IHM --> Enseignant : salle indisponible (réservée par un autre enseignant)
+  else salle disponible
+    G -> Reservation ** : créer(id, salle, enseignant, date, créneau, nb, motif)
+    G -> G : ajouter à la collection des réservations
+    G --> IHM : identifiant de la réservation
+    IHM --> Enseignant : réservation confirmée
+  end
+end
+@enduml

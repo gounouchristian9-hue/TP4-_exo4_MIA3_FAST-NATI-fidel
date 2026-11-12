@@ -1,0 +1,28 @@
+@startuml
+title Diagramme de composants
+skinparam componentStyle uml2
+
+package "Application C++ (gestion_departement)" {
+  component "IHM Console\n(main.cpp)" as IHM
+  component "Modèle métier\n(Modeles.hpp)\nPersonne, Etudiant, UE,\nMatiere, Note, Seance..." as Modele
+  component "Service Département\n(Departement.hpp)\nRègles de gestion, moyennes,\ncrédits, relevés" as Service
+  component "Gestion EDT\n(EmploiDuTemps)\ndétection de conflits" as EDT
+  component "Dépôt CSV\n(lecture / écriture)" as Depot
+}
+
+database "Fichiers CSV\n(etudiants.csv, notes.csv, ...)" as CSV
+file "Relevés (.txt)" as Releves
+
+interface "IGestion" as IG
+interface "IPersistance" as IP
+
+IHM --> IG
+Service -up- IG
+Service ..> Modele : utilise
+Service ..> EDT : utilise
+EDT ..> Modele
+Service --> IP
+Depot -up- IP
+Depot --> CSV : lit / écrit
+Service --> Releves : génère
+@enduml

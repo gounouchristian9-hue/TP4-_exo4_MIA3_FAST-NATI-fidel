@@ -1,0 +1,22 @@
+@startuml
+title Séquence - Saisie d'une note
+actor Enseignant
+participant "IHM Console" as IHM
+participant Departement
+participant Note
+participant "Depot CSV" as Depot
+
+Enseignant -> IHM : saisir(idEtudiant, codeMatiere, valeur)
+IHM -> Departement : saisirNote(idEtudiant, codeMatiere, valeur)
+Departement -> Departement : verifier étudiant et matière existent
+alt valeur hors [0 ; 20] ou entité inconnue
+  Departement --> IHM : exception (erreur)
+  IHM --> Enseignant : message d'erreur
+else données valides
+  Departement -> Note ** : créer(idEtudiant, codeMatiere, valeur)
+  Departement -> Departement : remplacer note existante si présente
+  Departement -> Depot : sauvegarder(notes.csv)
+  Departement --> IHM : OK
+  IHM --> Enseignant : confirmation
+end
+@enduml

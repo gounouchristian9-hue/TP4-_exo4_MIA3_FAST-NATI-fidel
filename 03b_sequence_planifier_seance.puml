@@ -1,0 +1,28 @@
+@startuml
+title Séquence - Planification d'une séance
+actor "Responsable scolarité" as Scol
+participant "IHM Console" as IHM
+participant Departement
+participant EmploiDuTemps as EDT
+participant Seance
+participant "Depot CSV" as Depot
+
+Scol -> IHM : planifier(matière, salle, jour, début, fin)
+IHM -> Departement : planifierSeance(seance)
+Departement -> Departement : vérifier matière, salle, horaires
+Departement -> EDT : ajouter(seance)
+loop pour chaque séance existante
+  EDT -> Seance : chevauche(autre)
+  Seance --> EDT : bool
+end
+alt conflit salle / enseignant / groupe
+  EDT --> Departement : exception (conflit)
+  Departement --> IHM : erreur
+  IHM --> Scol : conflit détecté
+else aucun conflit
+  EDT --> Departement : OK
+  Departement -> Depot : sauvegarder(seances.csv)
+  Departement --> IHM : OK
+  IHM --> Scol : séance planifiée
+end
+@enduml

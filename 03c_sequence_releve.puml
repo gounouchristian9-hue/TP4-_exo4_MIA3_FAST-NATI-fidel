@@ -1,0 +1,28 @@
+@startuml
+title Séquence - Production d'un relevé de notes
+actor "Responsable scolarité" as Scol
+participant "IHM Console" as IHM
+participant Departement
+participant UE
+participant Matiere
+participant Note
+participant "Fichier releve" as F
+
+Scol -> IHM : releve(idEtudiant)
+IHM -> Departement : genererReleve(idEtudiant)
+Departement -> Departement : retrouver l'étudiant (filière, niveau)
+loop pour chaque UE du niveau
+  Departement -> UE : matieres()
+  loop pour chaque matière
+    Departement -> Matiere : coefficient()
+    Departement -> Note : valeur(idEtudiant, codeMatiere)
+  end
+  Departement -> Departement : moyenneUE = Σ(note × coef) / Σ coef
+  Departement -> Departement : UE validée si moyenne ≥ 10
+end
+Departement -> Departement : crédits validés, moyenne générale pondérée par les crédits
+Departement -> Departement : decision()
+Departement --> IHM : texte du relevé
+IHM -> F : écrire releve_<id>.txt
+IHM --> Scol : afficher le relevé
+@enduml

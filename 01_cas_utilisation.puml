@@ -1,0 +1,66 @@
+@startuml
+title Diagramme global de cas d'utilisation - Gestion d'un département universitaire
+left to right direction
+skinparam packageStyle rectangle
+
+actor "Responsable\nscolarité" as Scol
+actor "Enseignant" as Ens
+actor "Étudiant" as Etu
+actor "Chef de\ndépartement / Jury" as Chef
+
+rectangle "Système de gestion du département" {
+  package "Structure pédagogique" {
+    usecase "Gérer les filières et niveaux" as UC1
+    usecase "Gérer les unités d'enseignement" as UC2
+    usecase "Gérer les matières" as UC3
+  }
+  package "Acteurs" {
+    usecase "Gérer les étudiants" as UC4
+    usecase "Gérer les enseignants" as UC5
+  }
+  package "Organisation" {
+    usecase "Gérer les salles" as UC6
+    usecase "Gérer les emplois du temps" as UC7
+    usecase "Planifier une séance" as UC8
+    usecase "Détecter les conflits\n(salle / enseignant / groupe)" as UC9
+    usecase "Consulter l'emploi du temps" as UC10
+  }
+  package "Évaluation" {
+    usecase "Saisir les notes" as UC11
+    usecase "Calculer moyennes et crédits" as UC12
+    usecase "Délibérer" as UC13
+    usecase "Produire un relevé de notes" as UC14
+    usecase "Consulter ses notes" as UC15
+  }
+  usecase "S'authentifier" as UC0
+}
+
+Scol --> UC1
+Scol --> UC2
+Scol --> UC3
+Scol --> UC4
+Scol --> UC5
+Scol --> UC6
+Scol --> UC7
+Scol --> UC14
+
+Ens --> UC11
+Ens --> UC10
+
+Etu --> UC10
+Etu --> UC15
+Etu --> UC14
+
+Chef --> UC13
+Chef --> UC12
+
+UC7 ..> UC8 : <<include>>
+UC8 ..> UC9 : <<include>>
+UC13 ..> UC12 : <<include>>
+UC14 ..> UC12 : <<include>>
+UC15 ..> UC12 : <<include>>
+UC11 ..> UC12 : <<extend>>
+UC10 ..> UC0 : <<include>>
+UC11 ..> UC0 : <<include>>
+UC13 ..> UC0 : <<include>>
+@enduml

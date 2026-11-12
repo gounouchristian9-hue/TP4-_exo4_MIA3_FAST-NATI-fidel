@@ -1,0 +1,41 @@
+@startuml
+title Diagramme d'activités - Processus de délibération
+|Scolarité|
+start
+:Clôturer la saisie des notes;
+|Système|
+:Vérifier que toutes les notes sont saisies;
+if (Notes complètes ?) then (non)
+  |Scolarité|
+  :Relancer les enseignants;
+  |Enseignant|
+  :Compléter les notes manquantes;
+  |Système|
+endif
+repeat
+  :Prendre un étudiant;
+  :Calculer la moyenne de chaque UE\nΣ(note × coef) / Σ coef;
+  :Valider les UE dont la moyenne ≥ 10;
+  :Calculer les crédits validés;
+  :Calculer la moyenne générale\npondérée par les crédits;
+repeat while (Autre étudiant ?) is (oui)
+->non;
+|Jury|
+:Examiner les résultats;
+repeat
+  :Examiner un étudiant;
+  if (Tous les crédits validés ?) then (oui)
+    :Décision : ADMIS;
+  elseif (Moyenne générale ≥ 10 ?) then (oui)
+    :Décision : ADMIS PAR COMPENSATION;
+  else (non)
+    :Décision : AJOURNÉ;
+  endif
+repeat while (Autre étudiant ?) is (oui)
+->non;
+:Signer le procès-verbal;
+|Scolarité|
+:Publier les résultats;
+:Produire les relevés de notes;
+stop
+@enduml

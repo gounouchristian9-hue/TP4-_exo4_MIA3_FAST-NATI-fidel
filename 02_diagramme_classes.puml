@@ -1,0 +1,122 @@
+@startuml
+title Diagramme de classes - Gestion d'un département universitaire
+skinparam classAttributeIconSize 0
+
+abstract class Personne {
+  # id : string
+  # nom : string
+  # prenom : string
+  + id() : string
+  + nomComplet() : string
+  + {abstract} toCsv() : string
+}
+
+class Etudiant {
+  - codeFiliere : string
+  - codeNiveau : string
+  + toCsv() : string
+  + {static} fromCsv(ligne) : Etudiant
+}
+
+class Enseignant {
+  - specialite : string
+  + toCsv() : string
+  + {static} fromCsv(ligne) : Enseignant
+}
+
+class Departement {
+  - nom : string
+  + ajouterFiliere(f : Filiere)
+  + ajouterNiveau(n : Niveau)
+  + ajouterEtudiant(e : Etudiant)
+  + ajouterEnseignant(e : Enseignant)
+  + ajouterUE(u : UE)
+  + ajouterMatiere(m : Matiere)
+  + ajouterSalle(s : Salle)
+  + planifierSeance(s : Seance)
+  + saisirNote(idEtu, codeMatiere, valeur)
+  + moyenneUE(idEtu, ue) : double
+  + creditsValides(idEtu) : int
+  + moyenneGenerale(idEtu) : double
+  + decision(idEtu) : string
+  + genererReleve(idEtu) : string
+  + sauvegarder(dossier)
+  + charger(dossier)
+}
+
+class Filiere {
+  - code : string
+  - nom : string
+}
+
+class Niveau {
+  - code : string
+  - libelle : string
+}
+
+class UE {
+  - code : string
+  - intitule : string
+  - credits : int
+  - codeFiliere : string
+  - codeNiveau : string
+}
+
+class Matiere {
+  - code : string
+  - intitule : string
+  - coefficient : double
+  - codeUE : string
+  - idEnseignant : string
+}
+
+class Note {
+  - idEtudiant : string
+  - codeMatiere : string
+  - valeur : double
+}
+
+class Salle {
+  - code : string
+  - capacite : int
+}
+
+class Seance {
+  - codeMatiere : string
+  - idEnseignant : string
+  - codeSalle : string
+  - codeFiliere : string
+  - codeNiveau : string
+  - jour : int
+  - heureDebut : int
+  - heureFin : int
+  + chevauche(autre : Seance) : bool
+}
+
+class EmploiDuTemps {
+  + ajouter(s : Seance)
+  + pour(filiere, niveau) : Seance[*]
+  + conflit(s : Seance) : bool
+}
+
+Personne <|-- Etudiant
+Personne <|-- Enseignant
+
+Departement "1" *-- "1..*" Filiere
+Departement "1" o-- "*" Enseignant
+Departement "1" o-- "*" Salle
+Departement "1" *-- "1" EmploiDuTemps
+Filiere "1" o-- "1..*" Niveau : propose
+Filiere "1" -- "*" Etudiant : inscrit
+Niveau "1" -- "*" Etudiant
+Filiere "1" -- "*" UE
+Niveau "1" -- "*" UE
+UE "1" *-- "1..*" Matiere
+Enseignant "1" -- "*" Matiere : enseigne
+Etudiant "1" -- "*" Note : obtient
+Matiere "1" -- "*" Note : évaluée par
+EmploiDuTemps "1" *-- "*" Seance
+Seance "*" -- "1" Matiere
+Seance "*" -- "1" Salle
+Seance "*" -- "1" Enseignant
+@enduml

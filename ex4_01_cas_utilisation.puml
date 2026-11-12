@@ -1,0 +1,41 @@
+@startuml
+title Exercice 4 - Cas d'utilisation : réservation de salles
+left to right direction
+
+actor "Enseignant" as Ens
+actor "Responsable\ndu département" as Resp
+
+rectangle "Système de réservation de salles" {
+  usecase "S'identifier" as UC0
+  usecase "Consulter les salles" as UC1
+  usecase "Vérifier la disponibilité\nd'une salle" as UC2
+  usecase "Réserver une salle" as UC3
+  usecase "Contrôler les contraintes\n(capacité, conflit de créneau)" as UC4
+  usecase "Annuler une réservation" as UC5
+  usecase "Consulter ses réservations" as UC6
+  usecase "Gérer les salles" as UC7
+  usecase "Gérer les enseignants" as UC8
+  usecase "Consulter toutes les réservations" as UC9
+}
+
+Ens --> UC1
+Ens --> UC2
+Ens --> UC3
+Ens --> UC5
+Ens --> UC6
+
+Resp --> UC7
+Resp --> UC8
+Resp --> UC9
+Resp --> UC5
+
+UC3 ..> UC2 : <<include>>
+UC3 ..> UC4 : <<include>>
+UC3 ..> UC0 : <<include>>
+UC5 ..> UC0 : <<include>>
+UC6 ..> UC0 : <<include>>
+note right of UC5
+  Un enseignant n'annule que
+  ses propres réservations.
+end note
+@enduml

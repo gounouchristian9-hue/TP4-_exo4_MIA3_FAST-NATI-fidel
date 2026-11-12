@@ -1,0 +1,97 @@
+@startuml
+title Exercice 4 - Diagramme de classes : réservation de salles
+skinparam classAttributeIconSize 0
+
+enum Categorie {
+  COURS
+  TD
+  SOUTENANCE
+}
+
+class Salle {
+  - numero : string
+  - capacite : int
+  - categorie : Categorie
+  + numero() : string
+  + capacite() : int
+  + categorie() : Categorie
+  + toString() : string
+}
+
+class Enseignant {
+  - id : string
+  - nom : string
+  - prenom : string
+  + id() : string
+  + nomComplet() : string
+}
+
+class Date {
+  - jour : int
+  - mois : int
+  - annee : int
+  + {static} depuisTexte(s : string) : Date
+  + operator==(autre : Date) : bool
+  + toString() : string
+}
+
+class Creneau {
+  - debut : int  {minutes}
+  - fin : int    {minutes}
+  + {static} depuisTexte(debut, fin : string) : Creneau
+  + chevauche(autre : Creneau) : bool
+  + toString() : string
+}
+
+class Reservation {
+  - id : int
+  - numeroSalle : string
+  - idEnseignant : string
+  - nbParticipants : int
+  - motif : string
+  - active : bool
+  + annuler()
+  + estActive() : bool
+  + toString() : string
+}
+
+class GestionnaireReservations {
+  - prochainId : int
+  + ajouterSalle(s : Salle)
+  + ajouterEnseignant(e : Enseignant)
+  + estDisponible(numero, date, creneau) : bool
+  + sallesDisponibles(date, creneau, effectif) : Salle[*]
+  + reserver(idEns, numero, date, creneau, nb, motif) : int
+  + annuler(idReservation, idEnseignant)
+  + reservationsDeSalle(numero) : Reservation[*]
+  + reservationsDeEnseignant(id) : Reservation[*]
+}
+
+class ReservationException
+
+class "std::runtime_error" as RuntimeError <<bibliothèque standard>>
+ReservationException --|> RuntimeError
+note right of ReservationException
+  Levée en cas de violation d'une contrainte :
+  salle inconnue, capacité dépassée,
+  créneau déjà occupé, annulation non autorisée.
+end note
+
+Salle --> "1" Categorie
+Reservation *-- "1" Date
+Reservation *-- "1" Creneau
+Reservation "0..*" --> "1" Salle : concerne
+Reservation "0..*" --> "1" Enseignant : effectuée par
+GestionnaireReservations "1" o-- "0..*" Salle
+GestionnaireReservations "1" o-- "0..*" Enseignant
+GestionnaireReservations "1" *-- "0..*" Reservation
+GestionnaireReservations ..> ReservationException : <<throws>>
+
+note bottom of Reservation
+  Contrainte métier : deux réservations actives
+  de la même salle, à la même date, ne peuvent
+  pas avoir de créneaux qui se chevauchent.
+  Les associations vers Salle et Enseignant sont
+  implémentées par leurs identifiants.
+end note
+@enduml
